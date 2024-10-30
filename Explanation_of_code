@@ -1,0 +1,187 @@
+'''Here’s a detailed, step-by-step explanation of the updated code. We’ll break down each part, including class initialization, methods, and the main loop to ensure complete clarity.
+
+1. Class Initialization: __init__
+The __init__ method initializes important variables for the BookMyShow class.
+
+python
+Copy code
+def __init__(self):
+    # Initialize with some default data
+    self.movies = {
+        "Avatar": {"timing": "12:30 PM", "duration": "2h 45m", "languages": ["English", "Hindi", "Telugu"], "price": 200},
+        "Inception": {"timing": "3:30 PM", "duration": "2h 30m", "languages": ["English", "Hindi"], "price": 250},
+        "Bahubali": {"timing": "6:00 PM", "duration": "3h 10m", "languages": ["Telugu", "Hindi"], "price": 180}
+    }
+    self.snacks_menu = {"Popcorn": 50, "Soda": 30, "Nachos": 40}
+    self.seats = {f"{row}{num}": None for row in "ABCDEFGH" for num in range(1, 37)}
+    self.bookings = []
+Explanation:
+self.movies: A dictionary containing details of each movie such as timing, duration, languages, and ticket price.
+self.snacks_menu: A dictionary with snack items and their prices.
+self.seats: Creates seats labeled from A1 to H36, all set to None initially to represent availability. The dictionary comprehension {f"{row}{num}": None for row in "ABCDEFGH" for num in range(1, 37)} creates this structure.
+self.bookings: An empty list to store all booking records for later viewing.
+2. Display Available Movies: show_movies
+python
+Copy code
+def show_movies(self):
+    print("\nAvailable Movies:")
+    for movie in self.movies:
+        print(f"{movie} - Timings: {self.movies[movie]['timing']} | Duration: {self.movies[movie]['duration']} | Price: Rs {self.movies[movie]['price']}")
+Explanation:
+This function prints out each movie with its show timing, duration, and ticket price.
+It loops through the self.movies dictionary and formats each movie’s details.
+3. Choose a Movie: choose_movie
+python
+Copy code
+def choose_movie(self):
+    movie = input("\nEnter the movie name you want to watch: ")
+    if movie in self.movies:
+        print(f"You selected {movie}. Timings: {self.movies[movie]['timing']}, Duration: {self.movies[movie]['duration']}, Price per ticket: Rs {self.movies[movie]['price']}")
+        return movie
+    else:
+        print("Movie not found! Please choose a valid movie.")
+        return None
+Explanation:
+Input for Movie Name: Asks the user to input the name of the desired movie.
+Validation: Checks if the entered movie exists in self.movies.
+Output: If found, confirms the selected movie details; otherwise, shows an error message.
+Return: Returns the selected movie’s name if valid, otherwise returns None.
+4. Select Seats: select_seat
+python
+Copy code
+def select_seat(self):
+    selected_seats = []
+    while True:
+        print("\nAvailable seats (rows A1-A36):")
+        for seat, booked in self.seats.items():
+            status = "Booked" if booked else "Available"
+            print(f"{seat}: {status}", end=" | ")
+
+        seat_choice = input("\nEnter your seat number (e.g., A1) or type 'done' to finish: ").strip().upper()
+
+        if seat_choice == "DONE":
+            break
+
+        if seat_choice not in self.seats:
+            print("Invalid seat selection. Please enter a seat in the format A1-A36.")
+        elif self.seats[seat_choice] is not None:
+            print(f"Seat {seat_choice} is already booked. Please choose another.")
+        else:
+            self.seats[seat_choice] = "Booked"
+            selected_seats.append(seat_choice)
+            print(f"Seat {seat_choice} successfully booked.")
+
+    return selected_seats
+Explanation:
+Loop for Seat Selection: A while True loop allows the user to book multiple seats.
+Display Availability: Iterates over self.seats to show whether each seat is "Available" or "Booked."
+Seat Selection: Prompts the user for a seat number or "done" to finish seat selection.
+Validation: Ensures the seat is valid and available. If invalid, shows an error.
+Seat Booking: If available, the seat is marked as "Booked" in self.seats, and the seat number is added to selected_seats.
+Return: Returns a list of selected seats after the user finishes.
+5. Select Snacks: select_snacks
+python
+Copy code
+def select_snacks(self):
+    print("\nSnacks Menu:")
+    for snack, price in self.snacks_menu.items():
+        print(f"{snack}: Rs {price}")
+    snack_choice = input("Enter the snack you want: ")
+    if snack_choice in self.snacks_menu:
+        return snack_choice, self.snacks_menu[snack_choice]
+    else:
+        print("Snack not available.")
+        return None, 0
+Explanation:
+Display Snacks Menu: Prints each snack and its price.
+Input and Validation: Prompts the user to select a snack and checks if it exists.
+Return: If valid, returns the snack and its price; otherwise, returns None and 0 for invalid choices.
+6. Make Payment: make_payment
+python
+Copy code
+def make_payment(self, total_amount):
+    print("\nPayment Options:\n1. UPI\n2. Debit Card\n3. Credit Card")
+    option = input("Choose your payment option (1, 2, or 3): ")
+    if option in ["1", "2", "3"]:
+        print(f"Payment of Rs {total_amount} successful!")
+        return True
+    else:
+        print("Invalid payment option.")
+        return False
+Explanation:
+Display Payment Options: Lists available payment methods.
+Input for Payment Method: Asks the user to choose a payment option.
+Confirmation: If valid, confirms successful payment; otherwise, shows an error.
+Return: Returns True for a valid payment, False otherwise.
+7. Book a Ticket: book_ticket
+python
+Copy code
+def book_ticket(self):
+    self.show_movies()
+    movie = self.choose_movie()
+    if movie is None:
+        return
+
+    seats = self.select_seat()
+    if not seats:
+        return
+
+    snack, snack_price = self.select_snacks()
+    total_price = (self.movies[movie]['price'] * len(seats)) + snack_price
+    print(f"\nTotal amount to pay: Rs {total_price}")
+
+    if self.make_payment(total_price):
+        self.bookings.append({
+            "movie": movie,
+            "seats": seats,
+            "snack": snack,
+            "price": total_price
+        })
+        print("Booking successful!\n")
+    else:
+        print("Booking failed due to payment error.")
+Explanation:
+Movie Selection: Calls show_movies and choose_movie to confirm a movie.
+Seat Selection: Calls select_seat to confirm seat(s).
+Snack Selection: Calls select_snacks for snack selection.
+Total Price Calculation: Calculates the total based on the number of seats and snack price.
+Payment: Calls make_payment to process payment.
+Record Booking: If successful, appends the booking details to self.bookings.
+8. View Bookings: view_bookings
+python
+Copy code
+def view_bookings(self):
+    print("\nYour Bookings:")
+    if not self.bookings:
+        print("No bookings found.")
+    for idx, booking in enumerate(self.bookings, 1):
+        seats = ", ".join(booking["seats"])
+        print(f"Booking {idx}: Movie - {booking['movie']}, Seats - {seats}, Snack - {booking['snack']}, Total Paid - Rs {booking['price']}")
+Explanation:
+Display Bookings: Iterates over self.bookings to display all details for each booking, including movie name, seats, snack, and total paid.
+Check for Empty Bookings: Prints "No bookings found" if no bookings exist.
+9. Main Program Loop: main
+python
+Copy code
+def main():
+    app = BookMyShow()
+    
+    while True:
+        print("\n--- Book My Show ---")
+        print("1. View Bookings")
+        print("2. Book a Ticket")
+        print("3. Exit")
+        
+        choice = input("Enter your choice: ")
+        
+        if choice == "1":
+            app.view_bookings()
+        elif choice == "2":
+            app.book_ticket()
+        elif choice == "3":
+            print("Exiting the application.")
+            break
+        else:
+            print("Invalid option. Please choose a valid option.")'''
+
+# Run
