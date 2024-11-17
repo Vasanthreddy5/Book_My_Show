@@ -115,6 +115,7 @@ def main():
         
         choice = input("Enter your choice: ")
         
+        
         if choice == "1":
             app.view_bookings()
         elif choice == "2":
